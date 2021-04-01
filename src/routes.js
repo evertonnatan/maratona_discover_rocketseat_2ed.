@@ -12,13 +12,22 @@ const profile = {
     "vacation-per-year": 4
 }
 
+const jobs = []
 
 routes.get('/', (req, res) => res.render(views + "index"))
 routes.get('/job', (req, res) => res.render(views + "job"))
 routes.post('/job', (req, res) => {
-    console.log(req.body)
+    // req.body = { name: 'Hacker', 'daily-hours': '23', 'total-hours': '545' }
+
+    const job = req.body;
+    job.createdAt = Date.now(); // ATRIBUINDO UMA NOVA DATA
+
+    jobs.push(req.body);
+    return res.redirect('/');
 })
 routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
 routes.get('/profile', (req, res) => res.render(views + "profile", { profile } ))
 
-module.exports = routes
+module.exports = routes;
+
+
