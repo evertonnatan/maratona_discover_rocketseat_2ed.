@@ -18,18 +18,29 @@ const jobs = [
         name: "Pizzaria Akatsuki",
         "daily-hours": 2,
         "total-hours": 60,
-        created_at: Date.now()   
+        created_at: Date.now(),        
     },
     {
         id: 2,
         name: "Pizzaria Konoha",
         "daily-hours": 3,
         "total-hours": 50,
-        created_at: Date.now()   
+        created_at: Date.now(),          
     }
 ]
 
-routes.get('/', (req, res) => res.render(views + "index", { jobs }))
+routes.get('/', (req, res) => {
+    const updatedJobs = jobs.map((job) => {
+        const remainingDays = (job["total-hours"] / job["daily-hours"]).toFixed()
+
+        const createDate = new Date(job.created_at)
+        const dueDay = createDate.getDate() + Number(remainingDays)
+        const dueDate = createDate.setDate
+        return job
+    })
+    return res.render(views + "index", { jobs })
+
+})
 routes.get('/job', (req, res) => res.render(views + "job"))
 routes.post('/job', (req, res) => {
     const lastId = jobs[jobs.length - 1]?.id || 1;   
