@@ -3,14 +3,47 @@ const routes = express.Router()
 
 const views = __dirname + "/views/"
 
-const profile = {
-    name: "Everton",
-    avatar: "https://avatars.githubusercontent.com/u/37844708?v=4",
-    "monthly-budget": 3000,
-    "days-per-week": 5,
-    "hours-per-day": 5,
-    "vacation-per-year": 4,
-    "value-hour": 75
+const Profile = {
+    data: { 
+        name: "Everton",
+        avatar: "https://avatars.githubusercontent.com/u/37844708?v=4",
+        "monthly-budget": 3000,
+        "days-per-week": 5,
+        "hours-per-day": 5,
+        "vacation-per-year": 4,
+        "value-hour": 75
+    }, 
+    
+    controllers: {
+        index(req, res) {
+            return res.render(views + "profile", { profile: Profile.data })
+        },
+
+        update(req, res) {
+            const data = req.body
+
+            const weekPerYear = 53
+
+            const weekPerMonth = (weekPerYear - data["vacation-per-year"]) / 12
+
+            const weekTotalHours = data["hours-per-day"] * data["days-per-week"]
+
+            const monthlyTotalHours = weekTotalHours * weekPerMonth
+
+            
+            const valueHour = data["monthly-budget"] / monthlyTotalHours
+            
+            
+
+            Profile.data = {
+                ...Profile.data,
+                ...req.body,
+                "value-hour": valueHour
+            }
+
+            return res.redirect('/profile')
+        }
+    }
 }
 
 const Job = {
@@ -41,7 +74,7 @@ const Job = {
                 ...job,
                 remaining,
                 status,
-                budget: profile["value-hour"] * job["total-hours"]
+                budget: Profile.data["value-hour"] * job["total-hours"]
                 }
             })
 
@@ -56,7 +89,7 @@ const Job = {
         save(req, res ) {
             const lastId = Job.data[Job.data.length - 1]?.id || 1;   
 
-            jobs.push({
+            Job.data.push({
                 id: lastId + 1,
                 name: req.body.name,
                 "daily-hours": req.body["daily-hours"],
@@ -92,7 +125,8 @@ routes.get('/', Job.controllers.index)
 routes.get('/job', Job.controllers.create)
 routes.post('/job', Job.controllers.save)
 routes.get('/job/edit', (req, res) => res.render(views + "job-edit"))
-routes.get('/profile', (req, res) => res.render(views + "profile", { profile } ))
+routes.get('/profile', Profile.controllers.index )
+routes.post('/profile', Profile.controllers.update )
 
 module.exports = routes;
 
