@@ -53,14 +53,14 @@ const Job = {
             name: "Pizzaria Akatsuki",
             "daily-hours": 2,
             "total-hours": 1,
-            created_at: Date.now(),        
+            created_at: Date.now()
         },
         {
             id: 2,
             name: "Pizzaria Konoha",
             "daily-hours": 3,
             "total-hours": 50,
-            created_at: Date.now(),          
+            created_at: Date.now() 
         }
     ],
 
@@ -70,11 +70,12 @@ const Job = {
                 const updatedJobs = Job.data.map((job) => {
                 const remaining = Job.services.remainingDays(job)
                 const status = remaining <= 0 ? 'done' : 'progress'
+
                 return {
                 ...job,
                 remaining,
                 status,
-                budget: Profile.data["value-hour"] * job["total-hours"]
+                budget: Job.services.calculateBudget(job, Profile.data["value-hour"])
                 }
             })
 
@@ -109,6 +110,8 @@ const Job = {
                 return res.send("Job not found!")
             }
 
+            job.budget = Job.services.calculateBudget(job, Profile.data["value-hour"])
+
             return res.render(views + "job-edit", { job })
         }
 
@@ -129,9 +132,11 @@ const Job = {
             const dayDiff = Math.floor(timeDiffInMs / dayInMs)
     
             return dayDiff
-    }
+    },
+        calculateBudget: (job, valueHour) => valueHour * job["total-hours"]
 
     }
+
 }
 
 routes.get('/', Job.controllers.index)
